@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.img-bg {
+    /* background: url(././assets/back2.jpg); */
+
+    background-color: rgb(248, 241, 248);
+}
