@@ -10,7 +10,8 @@ import {
 } from "../../service";
 
 const Profile = () => {
-    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [status, setStatus] = useState(false);
     const [status2, setStatus2] = useState(false);
     const [data, setData] = useState(null);
@@ -18,13 +19,15 @@ const Profile = () => {
     const [editUsername, setEditUsername] = useState(false); // input holatini boshqarish
     const [newUsername, setNewUsername] = useState(""); // yangi username qiymati
 
-    const handleEmailChange = () => {
-        PostDataTokenJson("auth/reset/password/", { email: email }).then(
-            (res) => {
-                setStatus2(!status2);
-                setStatus(!status);
-            }
-        );
+    const handleChangepassword = () => {
+        const data = {
+            new_password: password,
+            confirm_password: confirmPassword,
+        };
+        PostDataTokenJson("auth/change/password/", data).then((res) => {
+            setStatus2(!status2);
+            setStatus(!status);
+        });
     };
 
     const handleUsernameSave = () => {
@@ -93,22 +96,25 @@ const Profile = () => {
 
                 {/* Xabar ko'rsatish */}
                 {status2 && (
-                    <p className="text-green-600">
-                        Мы отправили сообщение на ваш адрес электронной почты
-                    </p>
+                    <p className="text-green-600">Ваш пароль был изменен</p>
                 )}
 
                 {/* Email va send tugmasi */}
                 {status && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col items-center gap-3  w-[500px] bg-pink-50 p-5">
                         <Input
-                            onChange={(e) => setEmail(e.target.value)}
-                            label="Email"
+                            onChange={(e) => setPassword(e.target.value)}
+                            label="Пароль"
+                            color="pink"
+                        />
+                        <Input
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            label="Подтвердите пароль"
                             color="pink"
                         />
                         <Button
-                            onClick={handleEmailChange}
-                            className="bg-pink-500 flex items-center"
+                            onClick={handleChangepassword}
+                            className="bg-pink-500 flex justify-end items-center w-full"
                         >
                             <IoSend size={15} />
                         </Button>
