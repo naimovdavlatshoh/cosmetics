@@ -24,7 +24,11 @@ const Login = () => {
             .then((res) => {
                 localStorage.setItem("token", res.data.access);
                 toast.success("Успешный вход!");
-                setTimeout(() => navigate("/"), 1000);
+
+                setTimeout(() => {
+                    navigate("/");
+                    window.location.reload();
+                }, 1000);
             })
             .catch(() => {
                 toast.error("Ошибка входа! Проверьте данные.");

@@ -63,9 +63,9 @@ const Profile = () => {
                             />
                             <Button
                                 onClick={handleUsernameSave}
-                                className="bg-green-500 flex items-center gap-2"
+                                className="bg-green-500 flex items-center "
                             >
-                                <IoSave size={16} /> Save
+                                Save
                             </Button>
                         </>
                     ) : (
@@ -75,7 +75,7 @@ const Profile = () => {
                             </h1>
                             <Button
                                 onClick={() => setEditUsername(true)}
-                                className="bg-pink-400 flex items-center gap-2"
+                                className="bg-pink-600 flex items-center gap-2"
                             >
                                 <IoPencil size={16} /> Edit
                             </Button>

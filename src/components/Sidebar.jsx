@@ -5,13 +5,14 @@ import { AiFillProduct } from "react-icons/ai";
 import { GiHairStrands } from "react-icons/gi";
 import { AiFillSkin } from "react-icons/ai";
 import { MdReportProblem } from "react-icons/md";
-import { CgProfile } from "react-icons/cg"; // Profil ikonkasi
+import { CgProfile } from "react-icons/cg"; 
+import { CiLogout } from "react-icons/ci";
 
 const Sidebar = () => {
     return (
         <aside className="w-64 bg-white shadow-md p-4 flex flex-col h-screen">
             <h2 className="text-3xl font-semibold text-pink-400">
-                My_Cosmetics
+                Me_Cosmetics
             </h2>
             <nav className="mt-4 flex-grow">
                 <ul>
@@ -60,6 +61,13 @@ const Sidebar = () => {
             >
                 <CgProfile size={20} />
                 Профиль
+            </Link>
+            <Link
+                to={"/login"}
+                className="mt-auto p-2 rounded hover:bg-pink-400 hover:text-white flex gap-2 items-center text-pink-500"
+            >
+                <CiLogout />
+                Выход
             </Link>
         </aside>
     );

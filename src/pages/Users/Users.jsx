@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DeleteData, GetDataSimple } from "../../service";
 import { UpdateUserModal } from "./Updateuser";
+import { ConfirmationModal } from "./ConfirmationModal";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -11,6 +12,14 @@ const Users = () => {
     const [openModal, setOpenModal] = useState(false);
     const [status, setStatus] = useState(false);
     const [search, setSearch] = useState("");
+    const [token, setToken] = useState();
+    const [selectedUserId, setSelectedUserId] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        setToken(token);
+    }, []);
 
     const changeStatus = () => {
         setStatus(!status);
@@ -21,19 +30,32 @@ const Users = () => {
             `project/custumer/?page_size=${currentPage}&search=${search}`
         ).then((res) => {
             setUsers(res.results);
-            console.log(res.results);
             setTotalPages(res.total_pages);
         });
-    }, [currentPage, search, status]);
+    }, [currentPage, search, status, token]);
 
-    const handleDelete = (id) => {
-        DeleteData(`project/custumer/${id}/`).then(() => {
-            toast.success("Пользователь успешно удален!", {
-                position: "top-right",
-                autoClose: 3000,
+    const handleDeleteClick = (id) => {
+        setSelectedUserId(id);
+        setIsConfirmModalOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (selectedUserId) {
+            DeleteData(`project/custumer/${selectedUserId}/`).then(() => {
+                toast.success("Пользователь успешно удален!", {
+                    position: "top-right",
+                    autoClose: 3000,
+                });
+                changeStatus();
+                setIsConfirmModalOpen(false);
+                setSelectedUserId(null);
             });
-            changeStatus();
-        });
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setIsConfirmModalOpen(false);
+        setSelectedUserId(null);
     };
 
     return (
@@ -49,6 +71,7 @@ const Users = () => {
                     className="h-[34px] w-[200px] bg-transparent border-2 rounded-md px-2 outline-none border-pink-500 text-pink-500"
                 />
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {users.map((user) => (
                     <div
@@ -95,6 +118,14 @@ const Users = () => {
                                 {user.problems?.name}
                             </span>
                         </p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            Зарплата:{" "}
+                            <span className="text-pink-500">{user.salary}</span>
+                        </p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                        Профессия:{" "}
+                            <span className="text-pink-500">{user.profession}</span>
+                        </p>
                         <span className="mt-2 px-3 py-1 text-sm font-medium rounded-full bg-pink-100 text-pink-600 dark:bg-pink-900 dark:text-pink-300">
                             Баланс: {user.balance}
                         </span>
@@ -105,7 +136,7 @@ const Users = () => {
                             />
 
                             <button
-                                onClick={() => handleDelete(user.id)}
+                                onClick={() => handleDeleteClick(user.id)}
                                 className="px-3 py-1 bg-none border border-pink-500 text-pink-500  rounded-md hover:bg-pink-600 hover:text-white"
                             >
                                 Удалить
@@ -114,9 +145,12 @@ const Users = () => {
                     </div>
                 ))}
             </div>
+
             <div className="mt-6 flex justify-center gap-2">
                 <button
-                    // onClick={() => setPage(page - 1)}
+                    onClick={() =>
+                        currentPage > 1 && setCurrentPage(currentPage - 1)
+                    }
                     disabled={currentPage === 1}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
                 >
@@ -126,13 +160,23 @@ const Users = () => {
                     Страница {currentPage} из {totalPages}
                 </span>
                 <button
-                    // onClick={() => setPage(page + 1)}
+                    onClick={() =>
+                        currentPage < totalPages &&
+                        setCurrentPage(currentPage + 1)
+                    }
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
                 >
                     Вперед
                 </button>
             </div>
+
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={handleCancelDelete}
+                onConfirm={handleConfirmDelete}
+                message="Вы уверены, что хотите удалить этого пользователя?"
+            />
         </main>
     );
 };

@@ -71,7 +71,7 @@ const Products = () => {
                             <h2 className="text-lg font-semibold mb-2 text-pink-800">
                                 {product?.name}
                             </h2>
-                            <p className="text-gray-600 text-sm line-clamp-2">
+                            <p className="text-gray-600 text-sm line-clamp-2 h-[40px]">
                                 {product.description}
                             </p>
                             <p className="text-gray-700 text-sm mt-2">
