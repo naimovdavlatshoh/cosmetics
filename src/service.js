@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect } from "react";
 
-export const BASE_URL = "https://app.busipool.ru/api/";
+export const BASE_URL = "https://cosmetic.ibosh-dev.uz/api/";
 
 export const Token = localStorage.getItem("token");
 export const Role = localStorage.getItem("role");
