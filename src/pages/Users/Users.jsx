@@ -16,21 +16,23 @@ const Users = () => {
     const [selectedUserId, setSelectedUserId] = useState(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
+    const pageSize = 10; // sahifada nechta user ko‘rsatish
+
     useEffect(() => {
         const token = localStorage.getItem("token");
         setToken(token);
     }, []);
 
-    const changeStatus = () => {
-        setStatus(!status);
-    };
+    const changeStatus = () => setStatus(!status);
 
     useEffect(() => {
         GetDataSimple(
-            `project/custumer/?page_size=${currentPage}&search=${search}`
+            `project/custumer/?page=${currentPage}&page_size=${pageSize}&search=${search}`
         ).then((res) => {
-            setUsers(res.results);
-            setTotalPages(res.total_pages);
+            setUsers(res.results || []);
+            // Backend count beradi, total_pages ni o‘zim hisoblaymiz
+            const total = Math.ceil(res.count / pageSize);
+            setTotalPages(total);
         });
     }, [currentPage, search, status, token]);
 
@@ -79,7 +81,7 @@ const Users = () => {
                         className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md flex flex-col items-start text-center"
                     >
                         <div className="w-16 h-16 bg-pink-500 text-white flex items-center justify-center rounded-full text-xl font-semibold">
-                            {user?.first_name[0]}
+                            {user?.first_name?.[0] || "?"}
                         </div>
                         <h2 className="mt-3 text-lg font-semibold">
                             {user?.first_name}
@@ -123,21 +125,23 @@ const Users = () => {
                             <span className="text-pink-500">{user.salary}</span>
                         </p>
                         <p className="text-gray-500 dark:text-gray-400 text-sm">
-                        Профессия:{" "}
-                            <span className="text-pink-500">{user.profession}</span>
+                            Профессия:{" "}
+                            <span className="text-pink-500">
+                                {user.profession}
+                            </span>
                         </p>
                         <span className="mt-2 px-3 py-1 text-sm font-medium rounded-full bg-pink-100 text-pink-600 dark:bg-pink-900 dark:text-pink-300">
                             Баланс: {user.balance}
                         </span>
+
                         <div className="mt-4 flex gap-2">
                             <UpdateUserModal
                                 changeStatus={changeStatus}
                                 id={user?.id}
                             />
-
                             <button
                                 onClick={() => handleDeleteClick(user.id)}
-                                className="px-3 py-1 bg-none border border-pink-500 text-pink-500  rounded-md hover:bg-pink-600 hover:text-white"
+                                className="px-3 py-1 border border-pink-500 text-pink-500 rounded-md hover:bg-pink-600 hover:text-white"
                             >
                                 Удалить
                             </button>
@@ -146,6 +150,7 @@ const Users = () => {
                 ))}
             </div>
 
+            {/* Pagination */}
             <div className="mt-6 flex justify-center gap-2">
                 <button
                     onClick={() =>
@@ -156,9 +161,11 @@ const Users = () => {
                 >
                     Назад
                 </button>
+
                 <span className="px-4 py-2">
-                    Страница {currentPage} из {totalPages}
+                    Страница {currentPage} из {totalPages || 1}
                 </span>
+
                 <button
                     onClick={() =>
                         currentPage < totalPages &&
@@ -171,6 +178,7 @@ const Users = () => {
                 </button>
             </div>
 
+            {/* Confirmation Modal */}
             <ConfirmationModal
                 isOpen={isConfirmModalOpen}
                 onClose={handleCancelDelete}

@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
     Button,
-    Input,
     Card,
     CardBody,
     CardFooter,
@@ -20,17 +19,19 @@ const Products = () => {
     const [products, setProducts] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [status, setStatus] = useState(1);
+    const [status, setStatus] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
     const [open, setOpen] = useState(false);
 
     const changeStatus = () => setStatus(!status);
 
     useEffect(() => {
-        GetDataSimple(`project/product/?page_size=${currentPage}`).then(
+        GetDataSimple(`project/product/?page=${currentPage}&page_size=10`).then(
             (res) => {
-                setProducts(res.results);
-                setTotalPages(res.total_pages);
+                setProducts(res.results || []);
+                // Backendda total_pages yo‘q, lekin `count` bor
+                const total = Math.ceil(res.count / 10);
+                setTotalPages(total);
             }
         );
     }, [currentPage, status]);
@@ -54,6 +55,7 @@ const Products = () => {
                 <h1 className="text-3xl font-bold text-pink-500">Продукты</h1>
                 <AddProduct changeStatus={changeStatus} />
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {products.map((product) => (
                     <Card
@@ -102,23 +104,34 @@ const Products = () => {
                     </Card>
                 ))}
             </div>
-            <div className="mt-6 flex justify-center gap-2">
+
+            {/* --- Pagination --- */}
+            <div className="mt-6 flex justify-center items-center gap-2">
                 <button
+                    onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
                 >
                     Назад
                 </button>
-                <span className="px-4 py-2">
+
+                <span className="px-4 py-2 text-gray-800 font-medium">
                     Страница {currentPage} из {totalPages}
                 </span>
+
                 <button
+                    onClick={() =>
+                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md disabled:opacity-50"
                 >
                     Вперед
                 </button>
             </div>
+
             {/* Confirmation Modal */}
             <Dialog open={open} handler={() => setOpen(!open)}>
                 <DialogHeader>Подтверждение удаления</DialogHeader>
